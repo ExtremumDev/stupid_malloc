@@ -4,7 +4,6 @@
 
 int p_size = 0;
 int current_page_number = 0;
-int meta_size = sizeof(struct alloc);
 
 void *heap_start = NULL;
 
@@ -34,7 +33,7 @@ static void *find_free_memory(int size, struct alloc **prev_p, struct alloc **ne
                                                                 /* to the last free byte before next allocation               */
             return prev_end;
         }
-        prev_end = (void *) *next_p + meta_size + (*next_p)->size;
+        prev_end = (void *) *next_p + META_SIZE + (*next_p)->size;
         *prev_p = *next_p;
         *next_p = (*next_p)->next;
     }
@@ -50,7 +49,7 @@ void check_heap_extend(void *section_end)
     if(diff > 0){
         int page_need = diff / p_size + ( diff % p_size != 0 ? 1 : 0);
 
-        sbrk((current_page_number + page_need) * p_size);
+        sbrk(page_need * p_size);
 
         current_page_number += page_need;
     }
@@ -63,7 +62,7 @@ void *s_malloc(int size)
 
     setup_constants();
 
-    allocation_size = meta_size + size;
+    allocation_size = META_SIZE + size;
 
     new_section = find_free_memory(allocation_size, &prev_section, &next_section);
 
@@ -75,11 +74,12 @@ void *s_malloc(int size)
 
     if(prev_section != NULL){
         prev_section->next = new_section;
-    }
-
-    if(prev_section == NULL)
+    }else
         first_alloc = new_section;
+    if(new_section->next != NULL){
+        next_section->prev = new_section;
+    }
     
-    return (void *) new_section + meta_size;
+    return (void *) new_section + META_SIZE;
 
 }
