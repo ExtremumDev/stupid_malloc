@@ -1,5 +1,7 @@
 #include <unistd.h>
 
+#include "malloc.h"
+
 struct alloc {
     struct alloc *next;
     int size;

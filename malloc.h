@@ -1,6 +1,6 @@
-#ifndef MALLOC_H_SENTRY
-#define MALLOC_H_SENTRY
+/* Header file for intern use(not a part of library) */
 
-void *s_malloc(int size);
-
-#endif
+struct alloc {
+    struct alloc *next;
+    int size;
+};
