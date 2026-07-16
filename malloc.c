@@ -2,12 +2,6 @@
 
 #include "malloc.h"
 
-struct alloc {
-    struct alloc *next;
-    int size;
-};
-
-
 int p_size = 0;
 int current_page_number = 0;
 int meta_size = sizeof(struct alloc);
@@ -77,6 +71,7 @@ void *s_malloc(int size)
 
     new_section->size = size;
     new_section->next = next_section;
+    new_section->prev = prev_section;
 
     if(prev_section != NULL){
         prev_section->next = new_section;
