@@ -9,6 +9,10 @@ void *heap_start = NULL;
 
 struct alloc *first_alloc = NULL;
 
+#ifdef BUFFER_VERSION
+char *memory[8192];
+#endif
+
 
 static void setup_constants()
 {
@@ -17,7 +21,11 @@ static void setup_constants()
     }
 
     if(heap_start == NULL){
+#ifdef BUFFER_VERSION
+        heap_start = memory;
+#else
         heap_start = sbrk(0);
+#endif
     }
 }
 
