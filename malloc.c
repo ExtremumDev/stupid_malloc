@@ -1,5 +1,9 @@
 #include <unistd.h>
 
+#ifdef BUFFER_VERSION
+#include <stdlib.h>
+#endif
+
 #include "malloc.h"
 
 int p_size = 0;
@@ -10,7 +14,7 @@ void *heap_start = NULL;
 struct alloc *first_alloc = NULL;
 
 #ifdef BUFFER_VERSION
-char *memory[8192];
+char *memory;
 #endif
 
 
@@ -19,6 +23,9 @@ static void setup_constants()
     if(p_size == 0){
         p_size = getpagesize();
     }
+#ifdef BUFFER_VERSION
+    memory = malloc(p_size);
+#endif
 
     if(heap_start == NULL){
 #ifdef BUFFER_VERSION
@@ -50,15 +57,18 @@ static void *find_free_memory(int size, struct alloc **prev_p, struct alloc **ne
 }
 
 
-void check_heap_extend(void *section_end)
+static void check_heap_extend(void *section_end)
 {
     int diff = (section_end - heap_start) - current_page_number * p_size;
 
     if(diff > 0){
         int page_need = diff / p_size + ( diff % p_size != 0 ? 1 : 0);
 
+#ifdef BUFFER_VERSION
+        memory = realloc((current_page_number + page_need) * p_size);
+#else
         sbrk(page_need * p_size);
-
+#endif
         current_page_number += page_need;
     }
 }

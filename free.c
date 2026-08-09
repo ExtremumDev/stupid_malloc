@@ -26,8 +26,11 @@ void s_free(void *pointer)
             diff = current_page_number * p_size - byte_position;
 
             if(diff >= p_size){ /* One or more page are emplty and have not data -> reduce heap size */
-               int page_needed = byte_position / p_size + (byte_position % p_size != 0 ? 1 : 0); 
-               sbrk((page_needed - current_page_number) * p_size);
+               int page_needed = byte_position / p_size + (byte_position % p_size != 0 ? 1 : 0);
+#ifdef BUFFER_VERSION
+#else
+                sbrk((page_needed - current_page_number) * p_size);
+#endif
                current_page_number = page_needed;
             }
 
